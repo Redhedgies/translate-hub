@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TranslateHub</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f4f6fb;--surface:#ffffff;--surface2:#f0f2f8;--surface3:#e8eaf5;
+  --border:#dde1f0;--border2:#c8cde8;
+  --accent:#5b6ef5;--accent2:#7c8bff;
+  --success:#00b894;--warn:#e17055;--danger:#d63031;
+  --text:#1a1d2e;--text2:#6a70a0;--text3:#9098b8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+a{color:var(--accent2);text-decoration:none;}
+a:hover{text-decoration:underline;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:8px;}
+.nav-tabs{display:flex;gap:4px;flex:1;}
+.nav-tab{background:none;border:none;color:var(--text2);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px;transition:all .2s;}
+.nav-tab:hover{background:var(--surface2);color:var(--text);}
+.nav-tab.active{background:var(--surface3);color:var(--text);font-weight:600;}
+.api-status{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;white-space:nowrap;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.btn-primary:hover:not(:disabled){opacity:.9;transform:translateY(-1px);}
+.btn-secondary{background:var(--surface3);border:1px solid var(--border2);color:var(--text);}
+.btn-secondary:hover:not(:disabled){background:var(--border2);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover:not(:disabled){opacity:.85;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-success:hover:not(:disabled){opacity:.85;}
+.btn-sm{padding:6px 12px;font-size:13px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.badge-done{background:rgba(0,184,148,.15);color:var(--success);}
+.badge-progress{background:rgba(91,110,245,.15);color:var(--accent2);}
+.badge-draft{background:var(--surface3);color:var(--text2);}
+.badge-game{background:var(--surface3);color:var(--text2);}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:13px;color:var(--text2);font-weight:500;}
+.form-input,.form-select,.form-textarea{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border-color .2s;font-family:inherit;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);}
+.form-select option{background:var(--surface2);}
+.form-textarea{resize:vertical;line-height:1.6;}
+.hidden{display:none!important;}
+.flex{display:flex;}
+.items-center{align-items:center;}
+.justify-between{justify-content:space-between;}
+.gap-8{gap:8px;}
+.gap-12{gap:12px;}
+.gap-16{gap:16px;}
+.mb-8{margin-bottom:8px;}
+.mb-12{margin-bottom:12px;}
+.mb-16{margin-bottom:16px;}
+.mb-20{margin-bottom:20px;}
+.mb-24{margin-bottom:24px;}
+.mt-8{margin-top:8px;}
+.font-bold{font-weight:700;}
+.text-muted{color:var(--text2);}
+.text-sm{font-size:13px;}
+.text-success{color:var(--success);}
+.text-danger{color:var(--danger);}
+.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.lang-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
+.lang-tab-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s;}
+.lang-tab-btn:hover{border-color:var(--accent);}
+.lang-tab-btn.active{background:rgba(91,110,245,.15);border-color:var(--accent);color:var(--accent2);font-weight:600;}
+.settings-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.settings-tab{background:none;border:none;color:var(--text2);padding:12px 20px;cursor:pointer;font-size:14px;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
+.settings-tab:hover{color:var(--text);}
+.settings-tab.active{color:var(--accent2);border-bottom-color:var(--accent);font-weight:600;}
+.settings-panel{display:none;}
+.settings-panel.active{display:block;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;padding:10px 14px;font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--surface2);}
+.page{display:none;padding:32px 24px;max-width:1200px;margin:0 auto;}
+.page.active{display:block;}
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:32px;}
+.wizard-step{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text3);}
+.wizard-step.active{color:var(--accent2);font-weight:600;}
+.wizard-step.done{color:var(--success);}
+.wizard-num{width:28px;height:28px;border-radius:50%;background:var(--surface3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.wizard-step.active .wizard-num{background:var(--accent);border-color:var(--accent);color:#fff;}
+.wizard-step.done .wizard-num{background:var(--success);border-color:var(--success);color:#fff;}
+.wizard-line{flex:1;height:2px;background:var(--border);margin:0 12px;}
+.wizard-line.done{background:var(--success);}
+.step-panel{display:none;}
+.step-panel.active{display:block;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.stat-num{font-size:32px;font-weight:700;margin-bottom:4px;}
+.stat-label{font-size:13px;color:var(--text2);}
+.trans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.trans-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;}
+.trans-card .lang-name{font-size:14px;font-weight:600;margin-bottom:8px;}
+.trans-card .lang-status{font-size:13px;color:var(--text2);}
+.ko-versions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.ko-card{background:var(--surface2);border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;}
+.ko-card:hover{border-color:var(--border2);}
+.ko-card.selected{border-color:var(--accent);}
+.ko-card-title{font-size:15px;font-weight:600;margin-bottom:8px;}
+.platform-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px;}
+.platform-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.dd-wrap{position:relative;display:inline-block;}
+.dd-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;background:var(--surface);border:1px solid var(--border2);border-radius:10px;min-width:160px;z-index:200;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.dd-menu.open{display:block;}
+.dd-item{padding:10px 16px;cursor:pointer;font-size:14px;transition:background .15s;}
+.dd-item:hover{background:var(--surface2);}
+.dd-item.active{background:rgba(91,110,245,.1);color:var(--accent2);}
+.qc-banner{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px;}
+.qc-ok{background:rgba(0,184,148,.1);border:1px solid rgba(0,184,148,.3);color:var(--success);}
+.qc-warn{background:rgba(225,112,85,.1);border:1px solid rgba(225,112,85,.3);color:var(--warn);}
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:slideIn .3s ease;}
+.toast.success{border-color:var(--success);color:var(--success);}
+.toast.error{border-color:var(--danger);color:var(--danger);}
+.toast.info{border-color:var(--accent);color:var(--accent2);}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.divider{height:1px;background:var(--border);margin:24px 0;}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text2);}
+.empty-icon{font-size:48px;margin-bottom:16px;}
+.info-box{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:13px;color:var(--text2);}
+.publish-log{margin-top:12px;font-size:13px;}
+.publish-log-item{padding:4px 0;display:flex;align-items:center;gap:6px;}
+.color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;}
+input[type="color"]{width:40px;height:36px;border:1px solid var(--border2);border-radius:6px;background:var(--surface2);cursor:pointer;padding:2px;}
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<nav>
+  <span class="nav-logo">TranslateHub</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')">대시보드</button>
+    <button class="nav-tab" onclick="showPage('new-project')">새 프로젝트</button>
+    <button class="nav-tab" onclick="showPage('settings')">설정</button>
+  </div>
+  <div class="api-status" id="api-status-badge">
+    <div class="status-dot ok" id="api-dot"></div>
+    <span id="nav-api-status">● API 미설정</span>
+  </div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="flex items-center justify-between mb-24">
+    <div>
+      <h1 class="font-bold" style="font-size:24px;margin-bottom:4px;">패치노트 번역 대시보드</h1>
+      <p class="text-muted text-sm">한국어 정리 → 10개 언어 번역 → AI 품질검수</p>
+    </div>
+    <button class="btn btn-primary" onclick="showPage('new-project')">+ 새 프로젝트</button>
+  </div>
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="flex items-center gap-12 mb-16">
+    <div class="dd-wrap">
+      <button class="btn btn-secondary btn-sm" id="game-dd-btn" onclick="toggleGameDD()">
+        <span id="game-dd-dot" class="color-dot" style="background:#7c6af0;"></span>
+        <span id="game-dd-label">전체 게임</span>
+        <span>▾</span>
+      </button>
+      <div class="dd-menu" id="game-dd-menu"></div>
+    </div>
+  </div>
+  <div class="card" id="projects-container"></div>
+</div>
+
+<!-- NEW PROJECT -->
+<div class="page" id="page-new-project">
+  <div class="flex items-center gap-12 mb-24">
+    <button class="btn btn-secondary btn-sm" onclick="showPage('dashboard')">← 뒤로</button>
+    <h1 class="font-bold" style="font-size:22px;">새 프로젝트</h1>
+  </div>
+  <div class="wizard-steps mb-24">
+    <div class="wizard-step active" id="ws-1">
+      <div class="wizard-num">1</div>
+      <span>내용 입력</span>
+    </div>
+    <div class="wizard-line" id="wl-1"></div>
+    <div class="wizard-step" id="ws-2">
+      <div class="wizard-num">2</div>
+      <span>한국어 정리</span>
+    </div>
+    <div class="wizard-line" id="wl-2"></div>
+    <div class="wizard-step" id="ws-3">
+      <div class="wizard-num">3</div>
+      <span>번역 &amp; 저장</span>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-panel active" id="step-1">
+    <div class="card" style="max-width:700px;">
+      <div class="form-group mb-16">
+        <label class="form-label">프로젝트 제목</label>
+        <input class="form-input" id="np-title" placeholder="예: v2.5.0 패치노트">
+      </div>
+      <div class="form-group mb-16">
+        <label class="form-label">게임</label>
+        <select class="form-select" id="np-game"></select>
+      </div>
+      <div class="form-group mb-20">
+        <label class="form-label">원본 내용</label>
+        <textarea class="form-textarea" id="np-raw" rows="10" placeholder="번역할 패치노트 내용을 입력하세요..."></textarea>
+      </div>
+      <button class="btn btn-primary" id="btn-organize" onclick="startOrganize()">✨ AI로 한국어 정리하기</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-panel" id="step-2">
+    <div class="ko-versions-grid" id="ko-versions-grid"></div>
+    <p class="text-sm text-muted mb-16">선택한 버전이 번역 원본이 됩니다. 언어별 말투는 설정 → 말투 스타일에서 관리하세요.</p>
+    <button class="btn btn-primary" id="btn-translate" onclick="startTranslation()">🌐 전체 언어 번역 시작</button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-panel" id="step-3">
+    <div class="mb-20">
+      <h2 class="font-bold mb-12" style="font-size:16px;">번역 진행 상황</h2>
+      <div class="trans-grid" id="trans-progress-grid"></div>
+    </div>
+    <div class="mb-16">
+      <div class="lang-tabs" id="s3-lang-tabs"></div>
+      <div id="s3-lang-panels"></div>
+    </div>
+    <div class="flex gap-12">
+      <button class="btn btn-secondary" onclick="saveProject(false)">나중에 저장</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveProject(true)">💾 프로젝트 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT VIEW -->
+<div class="page" id="page-project-view">
+  <div class="flex items-center gap-12 mb-24">
+    <button class="btn btn-secondary btn-sm" onclick="showPage('dashboard')">← 뒤로</button>
+    <div class="flex-1">
+      <div class="flex items-center gap-12">
+        <h1 class="font-bold" style="font-size:22px;" id="pv-title"></h1>
+        <span id="pv-game-badge"></span>
+        <span id="pv-status-badge"></span>
+      </div>
+    </div>
+    <button class="btn btn-danger btn-sm" id="pv-delete-btn">🗑 삭제</button>
+  </div>
+  <div class="lang-tabs mb-20" id="pv-main-tabs">
+    <button class="lang-tab-btn active" onclick="pvTab('ko')">🇰🇷 한국어 원본</button>
+    <button class="lang-tab-btn" onclick="pvTab('trans')">🌐 번역 결과</button>
+  </div>
+  <div id="pv-ko-panel">
+    <div class="card">
+      <pre id="pv-ko-content" style="white-space:pre-wrap;font-family:inherit;line-height:1.7;"></pre>
+    </div>
+  </div>
+  <div id="pv-trans-panel" class="hidden">
+    <div class="lang-tabs mb-16" id="pv-lang-tabs"></div>
+    <div id="pv-lang-panels" class="mb-20"></div>
+    <div class="card">
+      <div class="flex justify-between items-center mb-12">
+        <div>
+          <h3 class="font-bold mb-4" style="font-size:15px;">채널 게시</h3>
+          <p class="text-sm text-muted">게시 채널에 연동된 Discord 등으로 전송합니다.</p>
+        </div>
+        <div class="flex items-center gap-12">
+          <span class="text-sm text-muted" id="publish-last-result"></span>
+          <button class="btn btn-primary" id="btn-publish" onclick="handlePublish()">🚀 채널에 게시하기</button>
+        </div>
+      </div>
+      <div class="publish-log" id="publish-log"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <h1 class="font-bold mb-24" style="font-size:22px;">설정</h1>
+  <div class="settings-tabs">
+    <button class="settings-tab active" onclick="settingsTab('tone')">말투 스타일</button>
+    <button class="settings-tab" onclick="settingsTab('apikey')">API 키</button>
+    <button class="settings-tab" onclick="settingsTab('reffile')">참고 파일</button>
+    <button class="settings-tab" onclick="settingsTab('publish')">게시 채널</button>
+    <button class="settings-tab" onclick="settingsTab('games')">게임 카테고리</button>
+  </div>
+
+  <!-- TONE -->
+  <div class="settings-panel active" id="stab-tone">
+    <div class="flex justify-between items-center mb-16">
+      <div>
+        <h2 class="font-bold mb-4" style="font-size:16px;">말투 스타일</h2>
+        <p class="text-sm text-muted">번역 시 사용할 말투를 정의합니다.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="toggleToneForm()">+ 추가</button>
+    </div>
+    <div class="card mb-16 hidden" id="tone-form-card">
+      <h3 class="font-bold mb-16" style="font-size:15px;" id="tone-form-title">새 말투 추가</h3>
+      <div class="form-group mb-12">
+        <label class="form-label">스타일 이름</label>
+        <input class="form-input" id="tf-name" placeholder="예: 친근한 말투">
+      </div>
+      <div class="form-group mb-12">
+        <label class="form-label">설명 (선택)</label>
+        <input class="form-input" id="tf-desc" placeholder="예: 유저 친화적이고 가벼운 톤">
+      </div>
+      <div class="form-group mb-12">
+        <label class="form-label">게임 연결</label>
+        <select class="form-select" id="tf-game">
+          <option value="">전체 공통</option>
+        </select>
+      </div>
+      <div class="form-group mb-12">
+        <label class="form-label">말투 지시문</label>
+        <textarea class="form-textarea" id="tf-prompt" rows="5" placeholder="예: 반말을 사용하고 이모지를 적극 활용하세요."></textarea>
+      </div>
+      <div class="flex gap-8 mb-12">
+        <button class="btn btn-secondary btn-sm" onclick="analyzeTonePrompt()">🤖 AI로 말투 분석</button>
+        <span class="text-sm text-muted items-center flex" id="tf-analyze-status"></span>
+      </div>
+      <div class="flex items-center gap-8 mb-16">
+        <input type="checkbox" id="tf-default" style="width:16px;height:16px;cursor:pointer;">
+        <label for="tf-default" class="text-sm" style="cursor:pointer;">기본값으로 설정</label>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-primary btn-sm" id="tone-save-btn" onclick="saveTone()">저장</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleToneForm()">취소</button>
+      </div>
+    </div>
+    <div class="flex items-center gap-12 mb-16">
+      <div class="dd-wrap">
+        <button class="btn btn-secondary btn-sm" id="tone-filter-btn" onclick="toggleToneFilterDD()">
+          <span id="tone-filter-label">전체 게임</span>
+          <span>▾</span>
+        </button>
+        <div class="dd-menu" id="tone-filter-dd"></div>
+      </div>
+    </div>
+    <div id="tone-list" class="mb-24"></div>
+    <div class="divider"></div>
+    <h3 class="font-bold mb-16" style="font-size:15px;">게임별 언어 말투 지정</h3>
+    <div class="flex items-center gap-12 mb-16">
+      <div class="dd-wrap">
+        <button class="btn btn-secondary btn-sm" id="tlang-game-btn" onclick="toggleTlangGameDD()">
+          <span id="tlang-game-label">게임 선택</span>
+          <span>▾</span>
+        </button>
+        <div class="dd-menu" id="tlang-game-dd"></div>
+      </div>
+    </div>
+    <div id="tlang-section" class="hidden">
+      <div class="flex items-center gap-12 mb-16">
+        <select class="form-select" id="tlang-all-select" style="width:200px;">
+          <option value="">일괄 선택...</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" onclick="applyTlangAll()">전체 적용</button>
+      </div>
+      <div class="card mb-16">
+        <table class="tbl" id="tlang-table"></table>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveTlang()">저장</button>
+    </div>
+  </div>
+
+  <!-- API KEY -->
+  <div class="settings-panel" id="stab-apikey">
+    <div style="max-width:580px;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Claude API 키</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">번역 및 한국어 정리에 사용됩니다. <a href="https://console.anthropic.com" target="_blank">Anthropic Console</a>에서 발급하세요.</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input class="form-input" type="password" id="input-claude-key" placeholder="sk-ant-api03-..." style="flex:1;" oninput="saveApiKey()">
+        <button class="btn btn-secondary" onclick="var e=document.getElementById('input-claude-key');e.type=e.type==='password'?'text':'password'">👁</button>
+        <button class="btn btn-danger" onclick="localStorage.removeItem('key_claude');document.getElementById('input-claude-key').value='';updateApiStatus()">삭제</button>
+      </div>
+      <div id="api-key-st" style="font-size:12px;color:var(--text3);">키를 입력하세요</div>
+      <div style="margin-top:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);">🔒 API 키는 브라우저 로컬 스토리지에 자동저장됩니다. 재접속 시에도 유지됩니다.</div>
+
+      <div style="height:1px;background:var(--border);margin:20px 0;"></div>
+
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">OpenAI API 키 <span style="font-size:11px;font-weight:400;color:var(--text3);">(선택 — 2차 품질검수)</span></div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Claude 번역 후 GPT-4o가 독립적으로 품질검수를 합니다. 없으면 Claude가 대신 검수합니다. <a href="https://platform.openai.com" target="_blank" style="color:var(--accent2);">OpenAI Platform</a>에서 발급하세요.</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input class="form-input" type="password" id="input-oai-key" placeholder="sk-..." style="flex:1;" oninput="saveOaiKey()">
+        <button class="btn btn-secondary" onclick="var e=document.getElementById('input-oai-key');e.type=e.type==='password'?'text':'password'">👁</button>
+        <button class="btn btn-danger" onclick="localStorage.removeItem('key_oai');document.getElementById('input-oai-key').value='';updateApiStatus()">삭제</button>
+      </div>
+      <div id="oai-key-st" style="font-size:12px;color:var(--text3);">키 미입력 시 Claude가 검수합니다</div>
+
+      <div style="height:1px;background:var(--border);margin:24px 0;"></div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+        <div style="font-size:15px;font-weight:700;">팀 공유 동기화 <span style="font-size:11px;font-weight:400;color:var(--text3);">(GitHub Gist)</span></div>
+        <span id="fb-status" style="font-size:12px;"></span>
+        <span id="fb-sync-indicator" style="font-size:12px;color:var(--text3);margin-left:auto;"></span>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">연결하면 <b>팀 전체가 같은 말투 스타일·참고파일·프로젝트</b>를 공유합니다. GitHub Gist를 공용 저장소로 사용합니다 — Firebase 불필요.</div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.8;">
+        <b>설정 방법 (2단계)</b><br>
+        ① <a href="https://gist.github.com" target="_blank" style="color:var(--accent2);">gist.github.com</a> → 새 Gist 생성 → 파일명 <code>translatehub.json</code>, 내용 <code>{}</code> → Create public gist<br>
+        ② <a href="https://github.com/settings/tokens/new?scopes=gist" target="_blank" style="color:var(--accent2);">GitHub 토큰 발급</a> → Gist 권한만 체크 → 토큰 복사<br>
+        → 아래에 입력 후 팀원들과 공유하면 끝!
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:4px;">
+        <input class="form-input" type="text" id="input-fb-url" placeholder="Gist ID (URL에서 복사: gist.github.com/{user}/{gistId})" style="flex:1;" oninput="saveFbConfig()">
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">gist.github.com 주소의 마지막 영문+숫자 조합 (예: a1b2c3d4e5f6...)</div>
+      <div style="display:flex;gap:8px;margin-bottom:4px;">
+        <input class="form-input" type="password" id="input-fb-secret" placeholder="GitHub Personal Access Token (ghp_...)" style="flex:1;" oninput="saveFbConfig()">
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">팀원 모두 같은 토큰 사용 가능 (내부 도구이므로 공유 OK)</div>
+      <button class="btn btn-secondary btn-sm" onclick="syncFromFirebase(false)">🔄 지금 동기화</button>
+      <div style="margin-top:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);">ℹ️ API 키(Claude/OpenAI)는 개인 브라우저에만 저장되고 Gist에는 올라가지 않습니다.</div>
+    </div>
+  </div>
+
+  <!-- REF FILE -->
+  <div class="settings-panel" id="stab-reffile">
+    <h2 class="font-bold mb-4" style="font-size:16px;">참고 파일</h2>
+    <p class="text-sm text-muted mb-20">번역 시 참고할 게임별 문서를 연결합니다.</p>
+    <div class="form-group mb-20" style="max-width:300px;">
+      <label class="form-label">게임 선택</label>
+      <select class="form-select" id="ref-game-select" onchange="renderRefFiles()"></select>
+    </div>
+    <div class="card mb-16" style="max-width:700px;">
+      <h3 class="font-bold mb-12" style="font-size:14px;">Google Drive 연동</h3>
+      <div class="form-group mb-12">
+        <label class="form-label">파일 이름</label>
+        <input class="form-input" id="ref-file-name" placeholder="예: 게임 용어 사전">
+      </div>
+      <div class="form-group mb-12">
+        <label class="form-label">Drive URL 또는 파일 ID</label>
+        <input class="form-input" id="ref-drive-url" placeholder="https://drive.google.com/file/d/... 또는 파일 ID">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="addDriveFile()">+ Drive 파일 추가</button>
+    </div>
+    <div id="ref-file-list" class="mb-16" style="max-width:700px;"></div>
+    <div class="divider" style="max-width:700px;"></div>
+    <div class="card" style="max-width:700px;">
+      <h3 class="font-bold mb-12" style="font-size:14px;">로컬 파일 업로드 (폴백)</h3>
+      <input type="file" id="ref-local-file" accept=".txt,.md" style="color:var(--text2);font-size:14px;">
+    </div>
+  </div>
+
+  <!-- PUBLISH -->
+  <div class="settings-panel" id="stab-publish">
+    <h2 class="font-bold mb-4" style="font-size:16px;">게시 채널</h2>
+    <p class="text-sm text-muted mb-20">게임별로 소셜 채널을 연동하세요. 번역 완료 후 게시 버튼을 눌러야만 게시됩니다.</p>
+    <div class="form-group mb-20" style="max-width:300px;">
+      <label class="form-label">게임 선택</label>
+      <select class="form-select" id="pub-game-select" onchange="renderPublishCards()"></select>
+    </div>
+    <div class="platform-grid" id="platform-grid"></div>
+    <div id="pub-form-area"></div>
+    <div class="info-box" style="max-width:700px;">
+      <strong>연동 방법 안내</strong><br>
+      • <b>Discord</b>: 서버 채널 설정 → 연동 → 웹훅 만들기에서 URL 복사<br>
+      • <b>Facebook</b>: Meta for Developers에서 페이지 액세스 토큰 발급<br>
+      • <b>Twitter/X</b>: Zapier에서 Webhook → Post Tweet Zap 생성 후 URL 사용<br>
+      • <b>Instagram</b>: Zapier에서 Webhook → Create Media Post Zap 생성 후 URL 사용
+    </div>
+  </div>
+
+  <!-- GAMES -->
+  <div class="settings-panel" id="stab-games">
+    <h2 class="font-bold mb-4" style="font-size:16px;">게임 카테고리</h2>
+    <p class="text-sm text-muted mb-20">번역 프로젝트를 분류할 게임을 관리합니다.</p>
+    <div class="card mb-16" style="max-width:700px;" id="game-list-card"></div>
+    <div class="card mb-16" style="max-width:700px;">
+      <h3 class="font-bold mb-12" style="font-size:14px;">프리셋 추가</h3>
+      <div class="flex gap-8" style="flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="addPresetGame('소울스트라이크','ss','#ff6b6b','#ee5a24')">소울스트라이크</button>
+        <button class="btn btn-secondary btn-sm" onclick="addPresetGame('스타세일러','ssr','#48dbfb','#0abde3')">스타세일러</button>
+        <button class="btn btn-secondary btn-sm" onclick="addPresetGame('컬러스위퍼','csw','#ff9ff3','#f368e0')">컬러스위퍼</button>
+        <button class="btn btn-secondary btn-sm" onclick="addPresetGame('파우팝매치','ppm','#55efc4','#00b894')">파우팝매치</button>
+      </div>
+    </div>
+    <div class="card" style="max-width:700px;">
+      <h3 class="font-bold mb-12" style="font-size:14px;">직접 추가</h3>
+      <div class="flex gap-8 items-center" style="flex-wrap:wrap;">
+        <input class="form-input" id="ng-name" placeholder="게임 이름" style="width:180px;">
+        <input class="form-input" id="ng-code" placeholder="코드(예:ss)" style="width:100px;">
+        <div class="flex items-center gap-4">
+          <label class="text-sm text-muted">색상1</label>
+          <input type="color" id="ng-c1" value="#7c6af0">
+        </div>
+        <div class="flex items-center gap-4">
+          <label class="text-sm text-muted">색상2</label>
+          <input type="color" id="ng-c2" value="#9d8ff5">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addCustomGame()">추가</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var LANGS=[
+  {code:'en',label:'🇺🇸 EN',name:'영어(English)'},
+  {code:'ja',label:'🇯🇵 JP',name:'일본어(Japanese)'},
+  {code:'zh',label:'🇹🇼 ZH',name:'중국어 번체'},
+  {code:'de',label:'🇩🇪 DE',name:'독일어(German)'},
+  {code:'fr',label:'🇫🇷 FR',name:'프랑스어(French)'},
+  {code:'es',label:'🇪🇸 ES',name:'스페인어(Spanish)'},
+  {code:'th',label:'🇹🇭 TH',name:'태국어(Thai)'},
+  {code:'vi',label:'🇻🇳 VI',name:'베트남어(Vietnamese)'},
+  {code:'id',label:'🇮🇩 ID',name:'인도네시아어'}
+];
+
+var PUBLISH_PLATFORMS=[
+  {id:'discord',name:'Discord',color:'#5865f2',
+   desc:'언어별로 다른 Discord 채널 웹훅을 설정합니다.',
+   globalFields:[],
+   langField:{id:'webhook',label:'웹훅 URL',placeholder:'https://discord.com/api/webhooks/...'}},
+  {id:'facebook',name:'Facebook',color:'#1877f2',
+   desc:'Page Access Token과 페이지 ID는 공통 설정하고, 언어별 게시 여부를 선택합니다.',
+   globalFields:[{id:'pageId',label:'페이지 ID',type:'text',placeholder:'123456789'},{id:'token',label:'Page Access Token',type:'password',placeholder:'EAABsbCS...'}],
+   langField:null},
+  {id:'twitter',name:'Twitter / X',color:'#000',
+   desc:'언어별로 다른 Zapier 웹훅을 설정합니다. 말머리 텍스트는 공통 적용됩니다.',
+   globalFields:[{id:'prefix',label:'말머리 텍스트 (선택)',type:'text',placeholder:'[패치노트] '}],
+   langField:{id:'webhook',label:'Zapier 웹훅 URL',placeholder:'https://hooks.zapier.com/hooks/catch/...'}},
+  {id:'instagram',name:'Instagram',color:'#e1306c',
+   desc:'언어별로 다른 Zapier 웹훅을 설정합니다. 기본 이미지는 공통 적용됩니다.',
+   globalFields:[{id:'imageUrl',label:'기본 이미지 URL (선택)',type:'text',placeholder:'https://cdn.your-game.com/banner.jpg'}],
+   langField:{id:'webhook',label:'Zapier 웹훅 URL',placeholder:'https://hooks.zapier.com/hooks/catch/...'}}
+];
+
+var currentPage='dashboard';
+var currentProjectId=null;
+var dashboardGameFilter='';
+var toneFilterGame='';
+var tlangSelectedGame='';
+var editingToneId=null;
+var pubSelectedGame='';
+var pubOpenPlatform=null;
+var s3CurrentLang='en';
+var pvCurrentMainTab='ko';
+var pvCurrentLang='en';
+var selectedKoVersion='friendly';
+var npTranslations={};
+var npQcResults={};
+var npKoVersions={friendly:'',official:'',detailed:''};
+var npTransStatus={};
+
+function getProjects(){
+  try{return JSON.parse(localStorage.getItem('th_projects')||'[]');}catch(e){return [];}
+}
+function saveProjects(arr){localStorage.setItem('th_projects',JSON.stringify(arr));}
+function getGames(){
+  var stored=localStorage.getItem('th_games');
+  if(stored){try{var g=JSON.parse(stored);if(g&&g.length)return g;}catch(e){}}
+  var defaults=[
+    {name:'소울스트라이크',code:'ss',c1:'#ff6b6b',c2:'#ee5a24'},
+    {name:'스타세일러',code:'ssr',c1:'#48dbfb',c2:'#0abde3'},
+    {name:'컬러스위퍼',code:'csw',c1:'#ff9ff3',c2:'#f368e0'},
+    {name:'파우팝매치',code:'ppm',c1:'#55efc4',c2:'#00b894'}
+  ];
+  localStorage.setItem('th_games',JSON.stringify(defaults));
+  return defaults;
+}
+function saveGames(arr){localStorage.setItem('th_games',JSON.stringify(arr));}
+function getCustomTones(){try{return JSON.parse(localStorage.getItem('th_custom_tones')||'[]');}catch(e){return [];}}
+function saveCustomTones(arr){localStorage.setItem('th_custom_tones',JSON.stringify(arr));}
+function getPublishConfig(gameCode,platformId){
+  try{return JSON.parse(localStorage.getItem('th_pub_'+gameCode+'_'+platformId)||'null');}catch(e){return null;}
+}
+function savePublishConfig(gameCode,platformId,cfg){localStorage.setItem('th_pub_'+gameCode+'_'+platformId,JSON.stringify(cfg));}
+function getDriveFiles(gameCode){try{return JSON.parse(localStorage.getItem('th_drive_'+gameCode)||'[]');}catch(e){return [];}}
+function saveDriveFiles(gameCode,arr){localStorage.setItem('th_drive_'+gameCode,JSON.stringify(arr));}
+function getGameTones(gameCode){try{return JSON.parse(localStorage.getItem('th_tones_'+(gameCode||'all'))||'{}');}catch(e){return {};}}
+function saveGameTones(gameCode,obj){localStorage.setItem('th_tones_'+(gameCode||'all'),JSON.stringify(obj));}
+
+function toast(msg,type){
+  type=type||'info';
+  var c=document.getElementById('toast-container');
+  var el=document.createElement('div');
+  el.className='toast '+type;
+  el.textContent=msg;
+  c.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},3500);
+}
+
+function updateApiStatus(){
+  var key=localStorage.getItem('key_claude')||'';
+  var st=document.getElementById('api-key-st');
+  var nav=document.getElementById('nav-api-status');
+  var oaiSt=document.getElementById('oai-key-st');
+  var oaiKey=localStorage.getItem('key_oai')||'';
+  if(key){
+    if(st){st.textContent='✓ 저장됨';st.style.color='var(--success)';}
+    if(nav){nav.textContent='● Claude 연결됨'+(oaiKey?' + OpenAI':'');nav.style.color='var(--success)';}
+  } else {
+    if(st){st.textContent='키를 입력하세요';st.style.color='var(--text3)';}
+    if(nav){nav.textContent='● API 미설정';nav.style.color='var(--danger)';}
+  }
+  if(oaiSt){oaiSt.textContent=oaiKey?'✓ 저장됨 — GPT-4o로 검수합니다':'키 미입력 시 Claude가 검수합니다';oaiSt.style.color=oaiKey?'var(--success)':'var(--text3)';}
+}
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(el){el.classList.remove('active');});
+  var pg=document.getElementById('page-'+p);
+  if(pg) pg.classList.add('active');
+  var tabs=document.querySelectorAll('.nav-tab');
+  if(p==='dashboard') tabs[0].classList.add('active');
+  else if(p==='new-project') tabs[1].classList.add('active');
+  else if(p==='settings') tabs[2].classList.add('active');
+  currentPage=p;
+  closeAllDDs();
+  if(p==='dashboard') renderDashboard();
+  else if(p==='new-project') initNewProject();
+  else if(p==='settings') renderSettings();
+  updateApiStatus();
+}
+
+function openProject(id){
+  currentProjectId=id;
+  document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('page-project-view').classList.add('active');
+  currentPage='project-view';
+  renderProjectView();
+  updateApiStatus();
+}
+
+function closeAllDDs(){
+  document.querySelectorAll('.dd-menu').forEach(function(m){m.classList.remove('open');});
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.dd-wrap')) closeAllDDs();
+});
+
+function toggleGameDD(){
+  var m=document.getElementById('game-dd-menu');
+  var isOpen=m.classList.contains('open');
+  closeAllDDs();
+  if(!isOpen){renderGameDDMenu();m.classList.add('open');}
+}
+function renderGameDDMenu(){
+  var m=document.getElementById('game-dd-menu');
+  var games=getGames();
+  var html='<div class="dd-item'+(dashboardGameFilter===''?' active':'')+'" onclick="setGameFilter(\'\')">전체</div>';
+  games.forEach(function(g){
+    html+='<div class="dd-item'+(dashboardGameFilter===g.code?' active':'')+'" onclick="setGameFilter(\''+g.code+'\')">'+
+      '<span class="color-dot" style="background:'+g.c1+';margin-right:8px;display:inline-block;"></span>'+escHtml(g.name)+'</div>';
+  });
+  m.innerHTML=html;
+}
+function setGameFilter(code){
+  dashboardGameFilter=code;
+  closeAllDDs();
+  var games=getGames();
+  var label=document.getElementById('game-dd-label');
+  var dot=document.getElementById('game-dd-dot');
+  if(!code){label.textContent='전체 게임';dot.style.background='#7c6af0';}
+  else {
+    var g=games.find(function(x){return x.code===code;});
+    if(g){label.textContent=g.name;dot.style.background=g.c1;}
+  }
+  renderProjectTable();
+}
+
+function toggleToneFilterDD(){
+  var m=document.getElementById('tone-filter-dd');
+  var isOpen=m.classList.contains('open');
+  closeAllDDs();
+  if(!isOpen){renderToneFilterDD();m.classList.add('open');}
+}
+function renderToneFilterDD(){
+  var m=document.getElementById('tone-filter-dd');
+  var games=getGames();
+  var html='<div class="dd-item'+(toneFilterGame===''?' active':'')+'" onclick="setToneFilter(\'\')">전체</div>';
+  games.forEach(function(g){
+    html+='<div class="dd-item'+(toneFilterGame===g.code?' active':'')+'" onclick="setToneFilter(\''+g.code+'\')">'+escHtml(g.name)+'</div>';
+  });
+  m.innerHTML=html;
+}
+function setToneFilter(code){
+  toneFilterGame=code;
+  closeAllDDs();
+  var games=getGames();
+  var lbl=document.getElementById('tone-filter-label');
+  if(!code){lbl.textContent='전체 게임';}
+  else{var g=games.find(function(x){return x.code===code;});if(g)lbl.textContent=g.name;}
+  renderToneList();
+}
+
+function toggleTlangGameDD(){
+  var m=document.getElementById('tlang-game-dd');
+  var isOpen=m.classList.contains('open');
+  closeAllDDs();
+  if(!isOpen){renderTlangGameDD();m.classList.add('open');}
+}
+function renderTlangGameDD(){
+  var m=document.getElementById('tlang-game-dd');
+  var games=getGames();
+  var html='<div class="dd-item" onclick="setTlangGame(\'\')">공통</div>';
+  games.forEach(function(g){
+    html+='<div class="dd-item'+(tlangSelectedGame===g.code?' active':'')+'" onclick="setTlangGame(\''+g.code+'\')">'+escHtml(g.name)+'</div>';
+  });
+  m.innerHTML=html;
+}
+function setTlangGame(code){
+  tlangSelectedGame=code;
+  closeAllDDs();
+  var lbl=document.getElementById('tlang-game-label');
+  if(!code){lbl.textContent='공통';}
+  else{var g=getGames().find(function(x){return x.code===code;});if(g)lbl.textContent=g.name;}
+  document.getElementById('tlang-section').classList.remove('hidden');
+  renderTlangTable();
+}
+
+function renderDashboard(){
+  renderStats();
+  renderProjectTable();
+}
+
+function renderStats(){
+  var projects=getProjects();
+  var now=new Date();
+  var thisMonth=projects.filter(function(p){
+    var d=new Date(p.createdAt);
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  }).length;
+  var done=projects.filter(function(p){return p.status==='done';}).length;
+  var progress=projects.filter(function(p){return p.status==='progress';}).length;
+  document.getElementById('stats-grid').innerHTML=
+    '<div class="stat-card"><div class="stat-num" style="color:var(--accent2)">'+projects.length+'</div><div class="stat-label">전체 프로젝트</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:var(--success)">'+done+'</div><div class="stat-label">번역 완료</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:var(--warn)">'+progress+'</div><div class="stat-label">진행 중</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:var(--text)">'+thisMonth+'</div><div class="stat-label">이번 달</div></div>';
+}
+
+function renderProjectTable(){
+  var projects=getProjects();
+  var games=getGames();
+  var filtered=dashboardGameFilter?projects.filter(function(p){return p.gameCode===dashboardGameFilter;}):projects;
+  var container=document.getElementById('projects-container');
+  if(!filtered.length){
+    container.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p class="mb-16">프로젝트가 없습니다.</p><button class="btn btn-primary" onclick="showPage(\'new-project\')">+ 새 프로젝트 만들기</button></div>';
+    return;
+  }
+  var rows=filtered.map(function(p){
+    var g=games.find(function(x){return x.code===p.gameCode;})||{name:p.gameCode,c1:'#7c6af0'};
+    var statusBadge=p.status==='done'?'<span class="badge badge-done">완료</span>':p.status==='progress'?'<span class="badge badge-progress">진행중</span>':'<span class="badge badge-draft">초안</span>';
+    var preview=escHtml((p.selectedKo||p.raw||'').substring(0,60));
+    var date=new Date(p.createdAt).toLocaleDateString('ko-KR');
+    return '<tr>'+
+      '<td><div class="font-bold" style="margin-bottom:4px;">'+escHtml(p.title)+'</div><div class="text-sm text-muted">'+preview+'...</div></td>'+
+      '<td><span class="badge badge-game"><span class="color-dot" style="background:'+g.c1+'"></span> '+escHtml(g.name)+'</span></td>'+
+      '<td>'+statusBadge+'</td>'+
+      '<td class="text-sm text-muted">'+date+'</td>'+
+      '<td><div class="flex gap-8">'+
+        '<button class="btn btn-secondary btn-sm" onclick="openProject(\''+p.id+'\')">열기 →</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="deleteProject(\''+p.id+'\')">🗑</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+  container.innerHTML='<table class="tbl"><thead><tr><th>제목</th><th>게임</th><th>상태</th><th>생성일</th><th>작업</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function deleteProject(id){
+  if(!confirm('프로젝트를 삭제하시겠습니까?')) return;
+  saveProjects(getProjects().filter(function(p){return p.id!==id;}));
+  renderDashboard();
+  toast('프로젝트가 삭제되었습니다.','info');
+}
+
+function initNewProject(){
+  goStep(1);
+  npTranslations={};
+  npQcResults={};
+  npKoVersions={friendly:'',official:'',detailed:''};
+  npTransStatus={};
+  selectedKoVersion='friendly';
+  var gameSelect=document.getElementById('np-game');
+  var games=getGames();
+  gameSelect.innerHTML=games.map(function(g){return '<option value="'+g.code+'">'+escHtml(g.name)+'</option>';}).join('');
+}
+
+function goStep(n){
+  [1,2,3].forEach(function(i){
+    document.getElementById('step-'+i).classList.remove('active');
+    var ws=document.getElementById('ws-'+i);
+    ws.classList.remove('active','done');
+    if(i<n) ws.classList.add('done');
+    else if(i===n) ws.classList.add('active');
+    if(i<3){
+      var wl=document.getElementById('wl-'+i);
+      if(i<n) wl.classList.add('done'); else wl.classList.remove('done');
+    }
+  });
+  document.getElementById('step-'+n).classList.add('active');
+}
+
+async function startOrganize(){
+  var title=document.getElementById('np-title').value.trim();
+  var raw=document.getElementById('np-raw').value.trim();
+  if(!title){toast('프로젝트 제목을 입력하세요.','error');return;}
+  if(!raw){toast('원본 내용을 입력하세요.','error');return;}
+  var btn=document.getElementById('btn-organize');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> 정리 중...';
+  var tones=[
+    {key:'friendly',style:'친근하고 가벼운'},
+    {key:'official',style:'공식적이고 정중한'},
+    {key:'detailed',style:'상세하고 설명적인'}
+  ];
+  var promises=tones.map(function(t){
+    return callClaude(
+      '게임 패치노트 에디터. 말투: '+t.style+'. ## 헤더, - 리스트, **강조** 형식을 사용하세요. 한국어로만 작성. 오해나 분란을 일으킬 수 있는 표현은 중립적으로.',
+      '다음을 한국어로 정리해주세요:\n\n'+raw
+    ).then(function(result){
+      npKoVersions[t.key]=result;
+    }).catch(function(e){
+      npKoVersions[t.key]='[오류: '+e.message+']';
+    });
+  });
+  await Promise.all(promises);
+  btn.disabled=false;
+  btn.innerHTML='✨ AI로 한국어 정리하기';
+  renderKoVersionCards();
+  goStep(2);
+}
+
+function renderKoVersionCards(){
+  var versions=[
+    {key:'friendly',label:'😊 친근한 말투',desc:'가볍고 친근하게'},
+    {key:'official',label:'📋 공식·정중한 말투',desc:'격식체, 전문적'},
+    {key:'detailed',label:'📖 상세 설명형',desc:'구체적이고 친절하게'}
+  ];
+  var grid=document.getElementById('ko-versions-grid');
+  grid.innerHTML=versions.map(function(v){
+    return '<div class="ko-card'+(selectedKoVersion===v.key?' selected':'')+'" id="ko-card-'+v.key+'" onclick="selectKoVersion(\''+v.key+'\')">'+
+      '<div class="ko-card-title">'+v.label+'</div>'+
+      '<p class="text-sm text-muted mb-12">'+v.desc+'</p>'+
+      '<textarea class="form-textarea" id="ko-ta-'+v.key+'" rows="9" onclick="event.stopPropagation()">'+escHtml(npKoVersions[v.key]||'')+'</textarea>'+
+      '<div style="margin-top:12px;">'+
+        '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();selectAndTranslate(\''+v.key+'\')">이 버전으로 번역</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function selectKoVersion(key){
+  selectedKoVersion=key;
+  document.querySelectorAll('.ko-card').forEach(function(c){c.classList.remove('selected');});
+  var card=document.getElementById('ko-card-'+key);
+  if(card) card.classList.add('selected');
+}
+
+function selectAndTranslate(key){
+  selectKoVersion(key);
+  startTranslation();
+}
+
+async function startTranslation(){
+  var ta=document.getElementById('ko-ta-'+selectedKoVersion);
+  if(ta) npKoVersions[selectedKoVersion]=ta.value;
+  var koText=npKoVersions[selectedKoVersion]||'';
+  if(!koText.trim()){toast('정리된 한국어 내용이 없습니다.','error');return;}
+  var gameCode=document.getElementById('np-game').value;
+  var btn=document.getElementById('btn-translate');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> 번역 시작...';
+  npTransStatus={};
+  LANGS.forEach(function(l){npTransStatus[l.code]='pending';npTranslations[l.code]='';});
+  goStep(3);
+  renderTransProgressGrid();
+  renderS3LangTabs();
+  renderS3LangPanels();
+  var chunks=[];
+  for(var i=0;i<LANGS.length;i+=3) chunks.push(LANGS.slice(i,i+3));
+  var refContext='';
+  try{refContext=await getRefContext(gameCode);}catch(e){}
+  for(var ci=0;ci<chunks.length;ci++){
+    var chunk=chunks[ci];
+    await Promise.all(chunk.map(function(lang){
+      return translateLang(lang,koText,gameCode,refContext);
+    }));
+  }
+  btn.disabled=false;
+  btn.innerHTML='🌐 전체 언어 번역 시작';
+  toast('번역이 완료되었습니다! 저장 버튼을 눌러주세요.','success');
+}
+
+async function translateLang(lang,koText,gameCode,refContext){
+  npTransStatus[lang.code]='loading';
+  renderTransProgressGrid();
+  renderS3LangTabs();
+  try{
+    var toneId=getGameTones(gameCode)[lang.code]||'';
+    var tonePrompt=getTonePrompt(toneId,gameCode);
+    var toneSection=tonePrompt.indexOf('\n')>=0
+      ? '\n\n[말투 지침]\n'+tonePrompt
+      : '\n\n[말투 지침]\n'+tonePrompt;
+    var sysMsg='당신은 게임 현지화 전문 번역가입니다. 아래 지침에 따라 주어진 텍스트를 '+lang.name+'로 번역하세요.\n\n[기본 지침]\n- 원문 마크다운 구조를 그대로 유지하세요.\n- 자연스럽고 유창하게 현지화하세요.\n- 오해나 분란을 일으킬 수 있는 표현은 중립적으로 표현하세요.\n- 번역문만 출력하고 설명은 붙이지 마세요.'+toneSection+(refContext||'');
+    var result=await callClaude(sysMsg,'다음을 '+lang.name+'로 번역:\n\n'+koText);
+    npTranslations[lang.code]=result;
+    var qc=await runQC(koText,lang.name,result);
+    npQcResults[lang.code]=qc;
+    npTransStatus[lang.code]='done';
+  } catch(e){
+    npTransStatus[lang.code]='error';
+    npTranslations[lang.code]='[번역 오류: '+e.message+']';
+    npQcResults[lang.code]=null;
+  }
+  renderTransProgressGrid();
+  renderS3LangTabs();
+  renderS3LangPanels();
+}
+
+async function runQC(ko,langName,translated){
+  var oaiQc=await callOpenAIQC(ko,langName,translated);
+  if(oaiQc) return oaiQc;
+  try{
+    var result=await callClaudeQC(ko,langName,translated);
+    return result;
+  } catch(e){}
+  return null;
+}
+
+function renderTransProgressGrid(){
+  var grid=document.getElementById('trans-progress-grid');
+  if(!grid) return;
+  grid.innerHTML=LANGS.map(function(l){
+    var st=npTransStatus[l.code]||'pending';
+    var icon=st==='pending'?'⏳':st==='loading'?'<span class="spinner" style="width:16px;height:16px;"></span>':st==='done'?'✅':'❌';
+    var lbl=st==='pending'?'대기중':st==='loading'?'번역중':st==='done'?'완료':'오류';
+    return '<div class="trans-card"><div class="lang-name">'+l.label+'</div><div style="margin-bottom:6px;">'+icon+'</div><div class="lang-status">'+lbl+'</div></div>';
+  }).join('');
+}
+
+function renderS3LangTabs(){
+  var tabs=document.getElementById('s3-lang-tabs');
+  if(!tabs) return;
+  tabs.innerHTML=LANGS.map(function(l){
+    var st=npTransStatus[l.code]||'';
+    var dot=st==='done'?' ✅':st==='error'?' ❌':'';
+    return '<button class="lang-tab-btn'+(s3CurrentLang===l.code?' active':'')+'" onclick="s3SelectLang(\''+l.code+'\')">'+l.label+dot+'</button>';
+  }).join('');
+}
+
+function s3SelectLang(code){
+  s3CurrentLang=code;
+  renderS3LangTabs();
+  renderS3LangPanels();
+}
+
+function renderS3LangPanels(){
+  var container=document.getElementById('s3-lang-panels');
+  if(!container) return;
+  var lang=LANGS.find(function(l){return l.code===s3CurrentLang;})||LANGS[0];
+  var qc=npQcResults[lang.code];
+  var qcHtml='';
+  if(qc){
+    if(qc.ok){qcHtml='<div class="qc-banner qc-ok">✅ QC 통과 — 점수: '+qc.score+'</div>';}
+    else{qcHtml='<div class="qc-banner qc-warn">⚠️ 주의사항: '+((qc.issues||[]).join(', '))+'</div>';}
+  }
+  var content=npTranslations[lang.code]||'';
+  container.innerHTML=qcHtml+
+    '<textarea class="form-textarea" id="s3-ta-'+lang.code+'" rows="14">'+escHtml(content)+'</textarea>'+
+    '<div class="flex gap-8 mt-8">'+
+      '<button class="btn btn-secondary btn-sm" onclick="copyS3Lang(\''+lang.code+'\')">📋 복사</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="retranslate(\''+lang.code+'\')">↺ 재번역</button>'+
+    '</div>';
+  var ta=document.getElementById('s3-ta-'+lang.code);
+  if(ta){
+    (function(lc,el){
+      el.addEventListener('input',function(){npTranslations[lc]=el.value;});
+    })(lang.code,ta);
+  }
+}
+
+function copyS3Lang(code){
+  var ta=document.getElementById('s3-ta-'+code);
+  if(!ta) return;
+  navigator.clipboard.writeText(ta.value).then(function(){toast('복사되었습니다.','success');}).catch(function(){toast('복사 실패','error');});
+}
+
+async function retranslate(code){
+  var gameCode=document.getElementById('np-game').value;
+  var koText=npKoVersions[selectedKoVersion]||'';
+  var lang=LANGS.find(function(l){return l.code===code;});
+  if(!lang) return;
+  var refContext='';
+  try{refContext=await getRefContext(gameCode);}catch(e){}
+  await translateLang(lang,koText,gameCode,refContext);
+}
+
+function saveProject(redirect){
+  var title=document.getElementById('np-title').value.trim()||'제목 없음';
+  var gameCode=document.getElementById('np-game').value;
+  var raw=document.getElementById('np-raw').value.trim();
+  var ta=document.getElementById('ko-ta-'+selectedKoVersion);
+  if(ta) npKoVersions[selectedKoVersion]=ta.value;
+  var allDone=LANGS.every(function(l){return npTransStatus[l.code]==='done'||npTransStatus[l.code]==='error';});
+  var hasAny=Object.keys(npTranslations).some(function(k){return npTranslations[k];});
+  var status=hasAny?(allDone?'done':'progress'):'draft';
+  var project={
+    id:'p_'+Date.now()+'_'+Math.random().toString(36).substr(2,6),
+    title:title,
+    gameCode:gameCode,
+    status:status,
+    createdAt:new Date().toISOString(),
+    raw:raw,
+    koVersions:JSON.parse(JSON.stringify(npKoVersions)),
+    selectedKo:npKoVersions[selectedKoVersion]||'',
+    translations:JSON.parse(JSON.stringify(npTranslations)),
+    qcResults:JSON.parse(JSON.stringify(npQcResults))
+  };
+  var projects=getProjects();
+  projects.unshift(project);
+  saveProjects(projects);
+  toast('프로젝트가 저장되었습니다.','success');
+  if(redirect){currentProjectId=project.id;openProject(project.id);}
+}
+
+function renderProjectView(){
+  var projects=getProjects();
+  var p=projects.find(function(x){return x.id===currentProjectId;});
+  if(!p){toast('프로젝트를 찾을 수 없습니다.','error');showPage('dashboard');return;}
+  var games=getGames();
+  var g=games.find(function(x){return x.code===p.gameCode;})||{name:p.gameCode,c1:'#7c6af0'};
+  document.getElementById('pv-title').textContent=p.title;
+  document.getElementById('pv-game-badge').innerHTML='<span class="badge badge-game"><span class="color-dot" style="background:'+g.c1+'"></span> '+escHtml(g.name)+'</span>';
+  var statusMap={done:'badge-done',progress:'badge-progress',draft:'badge-draft'};
+  var statusLabelMap={done:'완료',progress:'진행중',draft:'초안'};
+  document.getElementById('pv-status-badge').innerHTML='<span class="badge '+statusMap[p.status]+'">'+statusLabelMap[p.status]+'</span>';
+  document.getElementById('pv-delete-btn').onclick=function(){
+    if(confirm('이 프로젝트를 삭제하시겠습니까?')){
+      saveProjects(getProjects().filter(function(x){return x.id!==currentProjectId;}));
+      showPage('dashboard');
+      toast('삭제되었습니다.','info');
+    }
+  };
+  document.getElementById('pv-ko-content').textContent=p.selectedKo||p.raw||'(내용 없음)';
+  pvCurrentLang='en';
+  pvTab('ko');
+  renderPvLangTabs(p);
+  document.getElementById('publish-log').innerHTML='';
+  document.getElementById('publish-last-result').textContent='';
+}
+
+function pvTab(tab){
+  pvCurrentMainTab=tab;
+  var mainTabs=document.querySelectorAll('#pv-main-tabs .lang-tab-btn');
+  mainTabs.forEach(function(b){b.classList.remove('active');});
+  if(tab==='ko') mainTabs[0].classList.add('active'); else mainTabs[1].classList.add('active');
+  var koPanel=document.getElementById('pv-ko-panel');
+  var transPanel=document.getElementById('pv-trans-panel');
+  if(tab==='ko'){koPanel.classList.remove('hidden');transPanel.classList.add('hidden');}
+  else{koPanel.classList.add('hidden');transPanel.classList.remove('hidden');}
+}
+
+function renderPvLangTabs(p){
+  var tabs=document.getElementById('pv-lang-tabs');
+  tabs.innerHTML=LANGS.map(function(l){
+    return '<button class="lang-tab-btn'+(pvCurrentLang===l.code?' active':'')+'" onclick="pvSelectLang(\''+l.code+'\')">'+l.label+'</button>';
+  }).join('');
+  updatePvLangPanel(p);
+}
+
+function updatePvLangPanel(p){
+  var panels=document.getElementById('pv-lang-panels');
+  var lang=LANGS.find(function(l){return l.code===pvCurrentLang;})||LANGS[0];
+  var content=(p.translations&&p.translations[lang.code])||'(번역 없음)';
+  panels.innerHTML='<div class="card">'+
+    '<div class="flex justify-between items-center mb-12">'+
+      '<span class="font-bold">'+lang.name+'</span>'+
+      '<button class="btn btn-secondary btn-sm" onclick="copyPvLang()">📋 복사</button>'+
+    '</div>'+
+    '<pre id="pv-lang-content" style="white-space:pre-wrap;font-family:inherit;line-height:1.7;">'+escHtml(content)+'</pre>'+
+  '</div>';
+}
+
+function pvSelectLang(code){
+  pvCurrentLang=code;
+  document.querySelectorAll('#pv-lang-tabs .lang-tab-btn').forEach(function(b,i){
+    b.classList.toggle('active',LANGS[i]&&LANGS[i].code===code);
+  });
+  var projects=getProjects();
+  var p=projects.find(function(x){return x.id===currentProjectId;});
+  if(p) updatePvLangPanel(p);
+}
+
+function copyPvLang(){
+  var el=document.getElementById('pv-lang-content');
+  if(!el) return;
+  navigator.clipboard.writeText(el.textContent).then(function(){toast('복사되었습니다.','success');}).catch(function(){toast('복사 실패','error');});
+}
+
+async function handlePublish(){
+  var projects=getProjects();
+  var p=projects.find(function(x){return x.id===currentProjectId;});
+  if(!p){toast('프로젝트를 찾을 수 없습니다.','error');return;}
+  var planned=[];
+  PUBLISH_PLATFORMS.forEach(function(platform){
+    var cfg=getPublishConfig(p.gameCode,platform.id);
+    if(!cfg) return;
+    var langConfigs=cfg.langConfigs||{};
+    var hasNewFormat=Object.keys(langConfigs).length>0;
+    if(hasNewFormat){
+      LANGS.forEach(function(l){
+        var lc=langConfigs[l.code];
+        if(!lc||!lc.enabled) return;
+        if(platform.langField&&!lc.webhook) return; // webhook 미입력 스킵
+        planned.push({platform:platform,cfg:cfg,langCode:l.code,langWebhook:lc.webhook||''});
+      });
+    } else {
+      // 구버전 호환
+      var langs=cfg.langs||[];
+      langs.forEach(function(lc){planned.push({platform:platform,cfg:cfg,langCode:lc,langWebhook:cfg.webhook||''});});
+    }
+  });
+  if(!planned.length){
+    toast('연동된 게시 채널이 없습니다. 설정 → 게시 채널에서 연동하세요.','error');
+    return;
+  }
+  var confirmLines=[];
+  PUBLISH_PLATFORMS.forEach(function(platform){
+    var items=planned.filter(function(x){return x.platform.id===platform.id;});
+    if(items.length) confirmLines.push(platform.name+': '+items.map(function(x){return x.langCode.toUpperCase();}).join(', '));
+  });
+  if(!confirm(confirmLines.join('\n')+'\n\n게시하시겠습니까?')) return;
+  var btn=document.getElementById('btn-publish');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> 게시 중...';
+  document.getElementById('publish-log').innerHTML='';
+  var logEl=document.getElementById('publish-log');
+  var successCount=0;
+  var failCount=0;
+  for(var i=0;i<planned.length;i++){
+    var item=planned[i];
+    var langObj=LANGS.find(function(l){return l.code===item.langCode;})||{name:item.langCode};
+    var content=(p.translations&&p.translations[item.langCode])||'';
+    try{
+      await postToChannel(item.platform.id,item.cfg,item.langCode,p.title,content,p.gameCode,item.langWebhook||'');
+      var row=document.createElement('div');
+      row.className='publish-log-item text-success';
+      row.innerHTML='✓ '+item.platform.name+' — '+langObj.name;
+      logEl.appendChild(row);
+      successCount++;
+    } catch(e){
+      var row2=document.createElement('div');
+      row2.className='publish-log-item text-danger';
+      row2.innerHTML='✕ '+item.platform.name+' — '+langObj.name+': '+e.message;
+      logEl.appendChild(row2);
+      failCount++;
+    }
+  }
+  btn.disabled=false;
+  btn.innerHTML='🚀 채널에 게시하기';
+  document.getElementById('publish-last-result').textContent='성공 '+successCount+' / 실패 '+failCount;
+}
+
+async function postToChannel(platformId,cfg,langCode,title,content,gameCode,langWebhook){
+  var wh=langWebhook||cfg.webhook||'';
+  if(platformId==='discord'){
+    if(!wh) throw new Error('Discord 웹훅 URL이 없습니다.');
+    var res=await fetch(wh,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({embeds:[{title:title.substring(0,256),description:content.substring(0,2000),color:0x5b6ef5,footer:{text:'TranslateHub · '+langCode.toUpperCase()},timestamp:new Date().toISOString()}]})
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+  } else if(platformId==='facebook'){
+    if(!cfg.pageId||!cfg.token) throw new Error('Facebook pageId/token이 없습니다.');
+    var res2=await fetch('https://graph.facebook.com/v19.0/'+cfg.pageId+'/feed',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:content,access_token:cfg.token})
+    });
+    if(!res2.ok) throw new Error('HTTP '+res2.status);
+  } else if(platformId==='twitter'){
+    if(!wh) throw new Error('Twitter Zapier 웹훅 URL이 없습니다.');
+    var res3=await fetch(wh,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:(cfg.prefix||'')+content.substring(0,280),full_content:content,language:langCode})
+    });
+    if(!res3.ok) throw new Error('HTTP '+res3.status);
+  } else if(platformId==='instagram'){
+    if(!wh) throw new Error('Instagram Zapier 웹훅 URL이 없습니다.');
+    var res4=await fetch(wh,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({caption:content.substring(0,2200),image_url:cfg.imageUrl||'',language:langCode})
+    });
+    if(!res4.ok) throw new Error('HTTP '+res4.status);
+  }
+}
+
+function renderSettings(){
+  settingsTab('tone');
+  populateGameSelects();
+}
+
+function settingsTab(tab){
+  var tabNames=['tone','apikey','reffile','publish','games'];
+  document.querySelectorAll('.settings-tab').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.settings-panel').forEach(function(p){p.classList.remove('active');});
+  var idx=tabNames.indexOf(tab);
+  if(idx>=0) document.querySelectorAll('.settings-tab')[idx].classList.add('active');
+  document.getElementById('stab-'+tab).classList.add('active');
+  if(tab==='tone') renderToneList();
+  else if(tab==='reffile'){populateGameSelects();renderRefFiles();}
+  else if(tab==='publish'){populateGameSelects();renderPublishCards();}
+  else if(tab==='games') renderGameList();
+}
+
+function populateGameSelects(){
+  var games=getGames();
+  ['ref-game-select','pub-game-select'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.innerHTML=games.map(function(g){return '<option value="'+g.code+'">'+escHtml(g.name)+'</option>';}).join('');
+  });
+  var tfGame=document.getElementById('tf-game');
+  if(tfGame) tfGame.innerHTML='<option value="">전체 공통</option>'+games.map(function(g){return '<option value="'+g.code+'">'+escHtml(g.name)+'</option>';}).join('');
+}
+
+function toggleToneForm(){
+  editingToneId=null;
+  var card=document.getElementById('tone-form-card');
+  var titleEl=document.getElementById('tone-form-title');
+  if(titleEl) titleEl.textContent='새 말투 추가';
+  var saveBtn=document.getElementById('tone-save-btn');
+  if(saveBtn) saveBtn.textContent='저장';
+  card.classList.toggle('hidden');
+  if(!card.classList.contains('hidden')){
+    document.getElementById('tf-name').value='';
+    document.getElementById('tf-desc').value='';
+    document.getElementById('tf-prompt').value='';
+    document.getElementById('tf-default').checked=false;
+    var tfGame=document.getElementById('tf-game');
+    if(tfGame) tfGame.value='';
+  }
+}
+
+function editTone(id){
+  var tones=getCustomTones();
+  var tone=tones.find(function(t){return t.id===id;});
+  if(!tone) return;
+  editingToneId=id;
+  var card=document.getElementById('tone-form-card');
+  var titleEl=document.getElementById('tone-form-title');
+  if(titleEl) titleEl.textContent='말투 수정';
+  var saveBtn=document.getElementById('tone-save-btn');
+  if(saveBtn) saveBtn.textContent='수정 저장';
+  document.getElementById('tf-name').value=tone.name||'';
+  document.getElementById('tf-desc').value=tone.desc||'';
+  document.getElementById('tf-prompt').value=tone.prompt||'';
+  document.getElementById('tf-default').checked=!!tone.isDefault;
+  var tfGame=document.getElementById('tf-game');
+  if(tfGame) tfGame.value=tone.gameCode||'';
+  card.classList.remove('hidden');
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function toggleToneExpand(id,fullPrompt){
+  var preview=document.getElementById('tone-preview-'+id);
+  var btn=document.getElementById('tone-expand-btn-'+id);
+  if(!preview||!btn) return;
+  if(btn.dataset.expanded==='1'){
+    preview.textContent=(fullPrompt||'').substring(0,80)+(fullPrompt&&fullPrompt.length>80?'...':'');
+    btn.textContent='전체 보기';
+    btn.dataset.expanded='0';
+  } else {
+    preview.textContent=fullPrompt||'';
+    btn.textContent='접기';
+    btn.dataset.expanded='1';
+  }
+}
+
+function renderToneList(){
+  var tones=getCustomTones();
+  var filtered=toneFilterGame?tones.filter(function(t){return t.gameCode===toneFilterGame;}):tones;
+  var games=getGames();
+  var container=document.getElementById('tone-list');
+  if(!container) return;
+  if(!filtered.length){
+    container.innerHTML='<div class="empty-state" style="padding:32px;"><p>말투 스타일이 없습니다. 추가 버튼을 눌러 설정하세요.</p></div>';
+    return;
+  }
+  container.innerHTML=filtered.map(function(t){
+    var g=t.gameCode?games.find(function(x){return x.code===t.gameCode;}):null;
+    var gameBadge=g?'<span class="badge badge-game" style="margin-left:8px;">'+escHtml(g.name)+'</span>':'';
+    var defBadge=t.isDefault?'<span class="badge badge-done" style="margin-left:8px;">기본값</span>':'';
+    var preview=(t.prompt||'').substring(0,80)+(t.prompt&&t.prompt.length>80?'...':'');
+    var hasMore=(t.prompt||'').length>80;
+    var escapedPrompt=JSON.stringify(t.prompt||'');
+    return '<div class="card mb-12">'+
+      '<div class="flex justify-between items-center mb-8">'+
+        '<div class="flex items-center"><span class="font-bold">'+escHtml(t.name)+'</span>'+gameBadge+defBadge+'</div>'+
+        '<div class="flex gap-8">'+
+          '<button class="btn btn-secondary btn-sm" onclick="editTone(\''+t.id+'\')">✏️ 수정</button>'+
+          '<button class="btn btn-danger btn-sm" onclick="deleteTone(\''+t.id+'\')">삭제</button>'+
+        '</div>'+
+      '</div>'+
+      (t.desc?'<p class="text-sm text-muted mb-8">'+escHtml(t.desc)+'</p>':'')+
+      '<div style="background:var(--bg2);border-radius:6px;padding:10px;">'+
+        '<p class="text-sm" style="color:var(--text3);white-space:pre-wrap;margin:0;" id="tone-preview-'+t.id+'">'+escHtml(preview)+'</p>'+
+        (hasMore?'<button class="btn btn-secondary btn-sm" id="tone-expand-btn-'+t.id+'" style="margin-top:6px;font-size:11px;" data-expanded="0" onclick="toggleToneExpand(\''+t.id+'\','+escapedPrompt+')">전체 보기 ▾</button>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function saveTone(){
+  var name=document.getElementById('tf-name').value.trim();
+  var desc=document.getElementById('tf-desc').value.trim();
+  var gameCode=document.getElementById('tf-game').value;
+  var prompt=document.getElementById('tf-prompt').value.trim();
+  var isDefault=document.getElementById('tf-default').checked;
+  if(!name){toast('스타일 이름을 입력하세요.','error');return;}
+  if(!prompt){toast('말투 지시문을 입력하세요.','error');return;}
+  var tones=getCustomTones();
+  if(isDefault) tones.forEach(function(t){t.isDefault=false;});
+  if(editingToneId){
+    var idx=tones.findIndex(function(t){return t.id===editingToneId;});
+    if(idx>=0){
+      tones[idx]={id:editingToneId,name:name,desc:desc,gameCode:gameCode,prompt:prompt,isDefault:isDefault};
+    }
+    editingToneId=null;
+    var titleEl=document.getElementById('tone-form-title');
+    if(titleEl) titleEl.textContent='새 말투 추가';
+    toast('말투 스타일이 수정되었습니다.','success');
+  } else {
+    tones.push({id:'t_'+Date.now(),name:name,desc:desc,gameCode:gameCode,prompt:prompt,isDefault:isDefault});
+    toast('말투 스타일이 추가되었습니다.','success');
+  }
+  saveCustomTones(tones);
+  document.getElementById('tf-name').value='';
+  document.getElementById('tf-desc').value='';
+  document.getElementById('tf-prompt').value='';
+  document.getElementById('tf-default').checked=false;
+  document.getElementById('tone-form-card').classList.add('hidden');
+  renderToneList();
+  renderTlangSelects();
+}
+
+function deleteTone(id){
+  if(!confirm('삭제하시겠습니까?')) return;
+  saveCustomTones(getCustomTones().filter(function(t){return t.id!==id;}));
+  renderToneList();
+  toast('삭제되었습니다.','info');
+}
+
+async function analyzeTonePrompt(){
+  var ta=document.getElementById('tf-prompt');
+  var text=ta.value.trim();
+  if(!text){toast('먼저 말투 지시문을 입력하세요.','error');return;}
+  var status=document.getElementById('tf-analyze-status');
+  status.innerHTML='<span class="spinner" style="width:14px;height:14px;"></span> 분석중...';
+  try{
+    var result=await callClaude(
+      '당신은 글쓰기 스타일 분석가입니다.',
+      '다음 텍스트 샘플의 말투 특성을 분석하고, 이 말투를 재현하기 위한 구체적인 지시문을 한국어로 작성해주세요. 지시문만 출력하세요:\n\n'+text
+    );
+    ta.value=result;
+    status.innerHTML='<span style="color:var(--success)">✓ 완료</span>';
+  } catch(e){
+    status.innerHTML='<span style="color:var(--danger)">오류: '+e.message+'</span>';
+  }
+  setTimeout(function(){status.innerHTML='';},3000);
+}
+
+function renderTlangTable(){
+  var tones=getCustomTones();
+  var gameTones=getGameTones(tlangSelectedGame);
+  var tbl=document.getElementById('tlang-table');
+  var opts=tones.filter(function(t){return !t.gameCode||t.gameCode===tlangSelectedGame;});
+  var rows=LANGS.map(function(l){
+    var selHtml='<select class="form-select" id="tlang-'+l.code+'" style="max-width:220px;">'+
+      '<option value="">기본 (공식적이고 정중한)</option>'+
+      opts.map(function(t){return '<option value="'+t.id+'"'+(gameTones[l.code]===t.id?' selected':'')+'>'+escHtml(t.name)+'</option>';}).join('')+
+    '</select>';
+    return '<tr><td style="width:160px;">'+l.label+'</td><td>'+selHtml+'</td></tr>';
+  }).join('');
+  tbl.innerHTML='<thead><tr><th>언어</th><th>말투 스타일</th></tr></thead><tbody>'+rows+'</tbody>';
+  renderTlangSelects();
+}
+
+function renderTlangSelects(){
+  var allSel=document.getElementById('tlang-all-select');
+  if(!allSel) return;
+  var tones=getCustomTones();
+  var opts=tones.filter(function(t){return !t.gameCode||t.gameCode===tlangSelectedGame;});
+  allSel.innerHTML='<option value="">일괄 선택...</option>'+opts.map(function(t){return '<option value="'+t.id+'">'+escHtml(t.name)+'</option>';}).join('');
+}
+
+function applyTlangAll(){
+  var val=document.getElementById('tlang-all-select').value;
+  LANGS.forEach(function(l){
+    var sel=document.getElementById('tlang-'+l.code);
+    if(sel) sel.value=val;
+  });
+}
+
+function saveTlang(){
+  var obj={};
+  LANGS.forEach(function(l){
+    var sel=document.getElementById('tlang-'+l.code);
+    if(sel&&sel.value) obj[l.code]=sel.value;
+  });
+  saveGameTones(tlangSelectedGame,obj);
+  toast('저장되었습니다.','success');
+}
+
+function renderApiKeys(){
+  // Cowork 버전에서는 API 키 UI 없음 - 호환성을 위해 유지
+}
+
+function autoSaveKeys(){
+  // Cowork 버전에서는 사용하지 않음
+  toast('Cowork 환경에서는 API 키가 필요 없습니다.','info');
+}
+
+function deleteKey(key){
+  // Cowork 버전에서는 사용하지 않음
+  localStorage.removeItem(key);
+  toast('삭제되었습니다.','info');
+}
+
+function toggleKeyVis(inputId,btn){
+  var inp=document.getElementById(inputId);
+  if(!inp) return;
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+}
+
+function extractDriveId(url){
+  if(!url) return null;
+  var m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return m[1];
+  m=url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if(m) return m[1];
+  m=url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if(m) return m[1];
+  if(/^[a-zA-Z0-9_-]{20,}$/.test(url.trim())) return url.trim();
+  return null;
+}
+
+function addDriveFile(){
+  var name=document.getElementById('ref-file-name').value.trim();
+  var urlVal=document.getElementById('ref-drive-url').value.trim();
+  var gameCode=document.getElementById('ref-game-select').value;
+  if(!name||!urlVal){toast('이름과 URL을 입력하세요.','error');return;}
+  var fileId=extractDriveId(urlVal);
+  if(!fileId){toast('유효한 Drive URL이나 ID를 입력하세요.','error');return;}
+  var files=getDriveFiles(gameCode);
+  files.push({fileId:fileId,name:name,url:urlVal,addedAt:new Date().toISOString()});
+  saveDriveFiles(gameCode,files);
+  document.getElementById('ref-file-name').value='';
+  document.getElementById('ref-drive-url').value='';
+  renderRefFiles();
+  toast('파일이 추가되었습니다.','success');
+}
+
+function renderRefFiles(){
+  var gSel=document.getElementById('ref-game-select');
+  if(!gSel) return;
+  var gameCode=gSel.value;
+  var files=getDriveFiles(gameCode);
+  var container=document.getElementById('ref-file-list');
+  if(!container) return;
+  if(!files.length){
+    container.innerHTML='<div class="card"><p class="text-muted text-sm">연동된 파일이 없습니다.</p></div>';
+    return;
+  }
+  container.innerHTML=files.map(function(f,i){
+    return '<div class="card mb-8 flex justify-between items-center">'+
+      '<div>'+
+        '<span class="font-bold text-sm">'+escHtml(f.name)+'</span>'+
+        '<span class="text-sm text-muted" style="margin-left:8px;">ID: '+f.fileId.substring(0,16)+'...</span>'+
+        '<a href="https://drive.google.com/file/d/'+f.fileId+'" target="_blank" style="margin-left:12px;font-size:13px;">Drive에서 열기</a>'+
+      '</div>'+
+      '<button class="btn btn-danger btn-sm" onclick="deleteDriveFile(\''+gameCode+'\','+i+')">삭제</button>'+
+    '</div>';
+  }).join('');
+}
+
+function deleteDriveFile(gameCode,idx){
+  var files=getDriveFiles(gameCode);
+  files.splice(idx,1);
+  saveDriveFiles(gameCode,files);
+  renderRefFiles();
+  toast('파일이 삭제되었습니다.','info');
+}
+
+function renderPublishCards(){
+  var gSel=document.getElementById('pub-game-select');
+  if(!gSel) return;
+  var gameCode=gSel.value;
+  pubSelectedGame=gameCode;
+  var grid=document.getElementById('platform-grid');
+  if(!grid) return;
+  grid.innerHTML=PUBLISH_PLATFORMS.map(function(platform){
+    var cfg=getPublishConfig(gameCode,platform.id);
+    var isSet=cfg&&(cfg.webhook||cfg.pageId);
+    var langs=(cfg&&cfg.langs)||[];
+    var statusBadge=isSet?'<span class="badge badge-done">연동됨</span>':'<span class="badge badge-draft">미설정</span>';
+    var langText=langs.length?langs.map(function(l){return l.toUpperCase();}).join(', '):'언어 미설정';
+    return '<div class="platform-card">'+
+      '<div class="flex items-center gap-12 mb-12">'+
+        '<div style="width:36px;height:36px;border-radius:50%;background:'+platform.color+';flex-shrink:0;"></div>'+
+        '<div><div class="font-bold">'+escHtml(platform.name)+'</div><div class="text-sm text-muted">'+langText+'</div></div>'+
+        statusBadge+
+      '</div>'+
+      '<button class="btn btn-secondary btn-sm" onclick="openPubForm(\''+platform.id+'\')">설정</button>'+
+    '</div>';
+  }).join('');
+  document.getElementById('pub-form-area').innerHTML='';
+}
+
+function openPubForm(platformId){
+  pubOpenPlatform=platformId;
+  var gSel=document.getElementById('pub-game-select');
+  var gameCode=gSel?gSel.value:'';
+  var platform=PUBLISH_PLATFORMS.find(function(p){return p.id===platformId;});
+  if(!platform) return;
+  var cfg=getPublishConfig(gameCode,platformId)||{};
+  var langConfigs=cfg.langConfigs||{};
+
+  // 글로벌 필드 (토큰, pageId 등)
+  var globalHtml=(platform.globalFields||[]).map(function(f){
+    return '<div class="form-group mb-12">'+
+      '<label class="form-label">'+escHtml(f.label)+'</label>'+
+      '<input class="form-input" id="pub-gf-'+f.id+'" type="'+(f.type||'text')+'" placeholder="'+escHtml(f.placeholder||'')+'" value="'+escHtml(cfg[f.id]||'')+'" autocomplete="off">'+
+    '</div>';
+  }).join('');
+
+  // 언어별 웹훅 테이블
+  var tableRows=LANGS.map(function(l){
+    var lc=langConfigs[l.code]||{};
+    var isEnabled=lc.enabled||(cfg.langs&&cfg.langs.indexOf(l.code)>-1)||false;
+    var webhookVal=lc.webhook||cfg.webhook||'';
+    var cbHtml='<input type="checkbox" id="pub-lang-cb-'+l.code+'" '+(isEnabled?'checked':'')+' style="width:14px;height:14px;cursor:pointer;" onchange="pubToggleLangRow(\''+l.code+'\')">';
+    var whHtml=platform.langField
+      ?'<input class="form-input" id="pub-lang-wh-'+l.code+'" placeholder="'+escHtml(platform.langField.placeholder||'')+'" value="'+escHtml(webhookVal)+'" style="font-size:12px;"'+(!isEnabled?' disabled':'')+' >'
+      :'<span class="text-sm text-muted">공통 설정 사용</span>';
+    return '<tr>'+
+      '<td style="width:110px;font-size:13px;">'+escHtml(l.label)+'</td>'+
+      '<td style="width:50px;text-align:center;">'+cbHtml+'</td>'+
+      (platform.langField?'<td>'+whHtml+'</td>':'')+
+    '</tr>';
+  }).join('');
+  var webhookColHeader=platform.langField?'<th>'+escHtml(platform.langField.label)+'</th>':'';
+  var langTableHtml='<div class="form-group mb-16">'+
+    '<label class="form-label" style="margin-bottom:8px;">언어별 설정</label>'+
+    '<div style="overflow-x:auto;">'+
+    '<table class="tbl"><thead><tr><th>언어</th><th style="text-align:center;">게시</th>'+webhookColHeader+'</tr></thead>'+
+    '<tbody>'+tableRows+'</tbody></table></div></div>';
+
+  var formHtml='<div class="card mt-16" style="max-width:760px;">'+
+    '<div class="mb-16">'+
+      '<h3 class="font-bold" style="font-size:15px;">'+escHtml(platform.name)+' 설정</h3>'+
+      '<p class="text-sm text-muted">'+escHtml(platform.desc)+'</p>'+
+    '</div>'+
+    (globalHtml?'<div class="card mb-16" style="background:var(--bg2);"><div class="font-bold text-sm mb-12">공통 설정</div>'+globalHtml+'</div>':'')+
+    langTableHtml+
+    '<div class="flex gap-8">'+
+      '<button class="btn btn-primary btn-sm" onclick="savePubConfig(\''+platformId+'\')">저장</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="document.getElementById(\'pub-form-area\').innerHTML=\'\'">취소</button>'+
+      '<button class="btn btn-secondary btn-sm" onclick="testPubConfig(\''+platformId+'\')">🧪 테스트 (첫 활성 언어)</button>'+
+    '</div>'+
+  '</div>';
+  document.getElementById('pub-form-area').innerHTML=formHtml;
+}
+
+function savePubConfig(platformId){
+  var gSel=document.getElementById('pub-game-select');
+  var gameCode=gSel?gSel.value:'';
+  var platform=PUBLISH_PLATFORMS.find(function(p){return p.id===platformId;});
+  if(!platform) return;
+  var cfg={langConfigs:{}};
+  // 글로벌 필드 저장
+  (platform.globalFields||[]).forEach(function(f){
+    var el=document.getElementById('pub-gf-'+f.id);
+    if(el) cfg[f.id]=el.value.trim();
+  });
+  // 언어별 설정 저장
+  LANGS.forEach(function(l){
+    var cb=document.getElementById('pub-lang-cb-'+l.code);
+    var wh=document.getElementById('pub-lang-wh-'+l.code);
+    cfg.langConfigs[l.code]={
+      enabled:!!(cb&&cb.checked),
+      webhook:wh?wh.value.trim():''
+    };
+  });
+  savePublishConfig(gameCode,platformId,cfg);
+  renderPublishCards();
+  toast('저장되었습니다.','success');
+}
+
+async function testPubConfig(platformId){
+  var gSel=document.getElementById('pub-game-select');
+  var gameCode=gSel?gSel.value:'';
+  var platform=PUBLISH_PLATFORMS.find(function(p){return p.id===platformId;});
+  if(!platform) return;
+  // 현재 폼에서 임시 cfg 구성
+  var cfg={langConfigs:{}};
+  (platform.globalFields||[]).forEach(function(f){
+    var el=document.getElementById('pub-gf-'+f.id);
+    if(el) cfg[f.id]=el.value.trim();
+  });
+  LANGS.forEach(function(l){
+    var cb=document.getElementById('pub-lang-cb-'+l.code);
+    var wh=document.getElementById('pub-lang-wh-'+l.code);
+    cfg.langConfigs[l.code]={enabled:!!(cb&&cb.checked),webhook:wh?wh.value.trim():''};
+  });
+  // 첫 번째 활성 언어로 테스트
+  var testLang=LANGS.find(function(l){var lc=cfg.langConfigs[l.code];return lc&&lc.enabled&&(platform.langField?lc.webhook:true);})||LANGS[0];
+  try{
+    await postToChannel(platformId,cfg,testLang.code,'[TranslateHub 테스트]','TranslateHub 채널 연동 테스트입니다.',gameCode);
+    toast('테스트 성공! ('+testLang.label+')','success');
+  } catch(e){
+    toast('테스트 실패: '+e.message,'error');
+  }
+}
+
+
+function pubToggleLangRow(langCode){
+  var cb=document.getElementById('pub-lang-cb-'+langCode);
+  var wh=document.getElementById('pub-lang-wh-'+langCode);
+  if(wh) wh.disabled=!(cb&&cb.checked);
+}
+
+// ── GitHub Gist 공유 동기화 ──────────────────────────────────────
+// Gist ID + GitHub PAT로 팀 전체 데이터 공유
+
+var GIST_FILENAME='translatehub.json';
+var fbSyncTimer=null;
+
+function getFbConfig(){
+  return {
+    gistId:(localStorage.getItem('key_fb_url')||'').trim(),
+    token:(localStorage.getItem('key_fb_secret')||'').trim()
+  };
+}
+function fbEnabled(){var c=getFbConfig();return !!(c.gistId&&c.token);}
+
+async function fbReadAll(){
+  var c=getFbConfig();
+  if(!c.gistId||!c.token) return null;
+  try{
+    var r=await fetch('https://api.github.com/gists/'+c.gistId,{
+      headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!r.ok) return null;
+    var data=await r.json();
+    var file=data.files&&data.files[GIST_FILENAME];
+    if(!file) return {};
+    var raw=file.content;
+    return raw?JSON.parse(raw):{};
+  }catch(e){return null;}
+}
+
+async function fbWriteAll(obj){
+  var c=getFbConfig();
+  if(!c.gistId||!c.token) return;
+  try{
+    await fetch('https://api.github.com/gists/'+c.gistId,{
+      method:'PATCH',
+      headers:{'Authorization':'token '+c.token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({files:{[GIST_FILENAME]:{content:JSON.stringify(obj,null,2)}}})
+    });
+  }catch(e){}
+}
+
+async function fbPushKey(storageKey,value){
+  if(!fbEnabled()) return;
+  var current=await fbReadAll()||{};
+  current[storageKey]=value;
+  await fbWriteAll(current);
+}
+
+async function syncFromFirebase(silent){
+  if(!fbEnabled()) return;
+  var indicator=document.getElementById('fb-sync-indicator');
+  if(indicator&&!silent) indicator.textContent='동기화 중...';
+  try{
+    var data=await fbReadAll();
+    if(!data){if(indicator) indicator.textContent='연결 실패';return;}
+    Object.keys(data).forEach(function(k){
+      var v=data[k];
+      localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));
+    });
+    var now=new Date();
+    var hhmm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    if(indicator) indicator.textContent='✓ '+hhmm+' 동기화됨';
+    renderDashboard();
+    if(document.querySelector('.settings-panel.active')){
+      var aid=document.querySelector('.settings-panel.active').id;
+      if(aid==='stab-tone') renderToneList();
+      else if(aid==='stab-reffile') renderRefFiles();
+      else if(aid==='stab-publish') renderPublishCards();
+      else if(aid==='stab-games') renderGameList();
+    }
+  }catch(e){if(indicator) indicator.textContent='동기화 오류';}
+}
+
+function startFbPolling(){
+  if(fbSyncTimer) clearInterval(fbSyncTimer);
+  if(!fbEnabled()) return;
+  fbSyncTimer=setInterval(function(){syncFromFirebase(true);},30000);
+}
+
+function saveFbConfig(){
+  var gistId=(document.getElementById('input-fb-url')||{}).value||'';
+  var token=(document.getElementById('input-fb-secret')||{}).value||'';
+  // Gist URL 전체가 들어온 경우 ID만 추출
+  var m=gistId.trim().match(/([a-f0-9]{20,})\/?$/i);
+  if(m) gistId=m[1];
+  else gistId=gistId.trim();
+  if(gistId) localStorage.setItem('key_fb_url',gistId); else localStorage.removeItem('key_fb_url');
+  if(token) localStorage.setItem('key_fb_secret',token); else localStorage.removeItem('key_fb_secret');
+  updateFbStatus();
+  if(fbEnabled()){syncFromFirebase(false);startFbPolling();}
+}
+
+function updateFbStatus(){
+  var el=document.getElementById('fb-status');
+  if(!el) return;
+  var c=getFbConfig();
+  el.innerHTML=(c.gistId&&c.token)?'<span style="color:var(--success)">✓ 연결됨</span>':'<span style="color:var(--text3)">미연결 (로컬 전용)</span>';
+}
+
+// 기존 save 함수들 래핑 → 저장 시 Gist에도 반영
+var _sp=saveProjects;
+saveProjects=function(arr){_sp(arr);fbPushKey('th_projects',arr);};
+var _sg=saveGames;
+saveGames=function(arr){_sg(arr);fbPushKey('th_games',arr);};
+var _sct=saveCustomTones;
+saveCustomTones=function(arr){_sct(arr);fbPushKey('th_custom_tones',arr);};
+var _spc=savePublishConfig;
+savePublishConfig=function(gc,pid,cfg){_spc(gc,pid,cfg);fbPushKey('th_pub_'+gc+'_'+pid,cfg);};
+var _sdf=saveDriveFiles;
+saveDriveFiles=function(gc,arr){_sdf(gc,arr);fbPushKey('th_drive_'+gc,arr);};
+var _sgt=saveGameTones;
+saveGameTones=function(gc,obj){_sgt(gc,obj);fbPushKey('th_tones_'+(gc||'all'),obj);};
+
+function renderGameList(){
+  var games=getGames();
+  var projects=getProjects();
+  var container=document.getElementById('game-list-card');
+  if(!container) return;
+  if(!games.length){
+    container.innerHTML='<div class="empty-state" style="padding:24px;"><p>등록된 게임이 없습니다.</p></div>';
+    return;
+  }
+  container.innerHTML='<table class="tbl"><thead><tr><th>게임</th><th>코드</th><th>프로젝트</th><th>작업</th></tr></thead><tbody>'+
+    games.map(function(g){
+      var cnt=projects.filter(function(p){return p.gameCode===g.code;}).length;
+      return '<tr>'+
+        '<td><div class="flex items-center gap-8"><div style="width:14px;height:14px;border-radius:50%;background:'+g.c1+';flex-shrink:0;"></div><span class="font-bold">'+escHtml(g.name)+'</span></div></td>'+
+        '<td class="text-muted">'+escHtml(g.code)+'</td>'+
+        '<td class="text-sm">'+cnt+'개</td>'+
+        '<td><button class="btn btn-danger btn-sm" onclick="deleteGame(\''+g.code+'\')">삭제</button></td>'+
+      '</tr>';
+    }).join('')+
+  '</tbody></table>';
+}
+
+function addPresetGame(name,code,c1,c2){
+  var games=getGames();
+  if(games.find(function(g){return g.code===code;})){toast('이미 있는 게임입니다.','info');return;}
+  games.push({name:name,code:code,c1:c1,c2:c2});
+  saveGames(games);
+  renderGameList();
+  toast(name+' 추가됨.','success');
+}
+
+function addCustomGame(){
+  var name=document.getElementById('ng-name').value.trim();
+  var code=document.getElementById('ng-code').value.trim().toLowerCase();
+  var c1=document.getElementById('ng-c1').value;
+  var c2=document.getElementById('ng-c2').value;
+  if(!name||!code){toast('이름과 코드를 입력하세요.','error');return;}
+  var games=getGames();
+  if(games.find(function(g){return g.code===code;})){toast('이미 있는 코드입니다.','error');return;}
+  games.push({name:name,code:code,c1:c1,c2:c2});
+  saveGames(games);
+  document.getElementById('ng-name').value='';
+  document.getElementById('ng-code').value='';
+  renderGameList();
+  toast(name+' 추가됨.','success');
+}
+
+function deleteGame(code){
+  if(!confirm('게임을 삭제하시겠습니까?')) return;
+  saveGames(getGames().filter(function(g){return g.code!==code;}));
+  renderGameList();
+  toast('삭제되었습니다.','info');
+}
+
+// ── Claude API 직접 호출 ──────────────────────────────────────────
+
+async function callClaude(system,user){
+  var key=localStorage.getItem('key_claude');
+  if(!key) throw new Error('Claude API 키가 없습니다. 설정 → API 키에서 입력하세요.');
+  var resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-opus-4-5',max_tokens:4096,system:system||'',messages:[{role:'user',content:user}]})
+  });
+  if(!resp.ok){var e=await resp.json().catch(function(){return{};});throw new Error(e.error&&e.error.message||'HTTP '+resp.status);}
+  var data=await resp.json();
+  return data.content&&data.content[0]?data.content[0].text:'';
+}
+
+async function callOpenAIQC(ko,langName,translated){
+  var key=localStorage.getItem('key_oai');
+  if(!key) return null;
+  try{
+    var resp=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'gpt-4o',max_tokens:300,
+        messages:[
+          {role:'system',content:'Game localization QC specialist. Respond ONLY with valid JSON: {"ok":true,"score":95,"issues":[]}.'},
+          {role:'user',content:'[Korean Original]\n'+ko.substring(0,600)+'\n\n['+langName+' Translation]\n'+translated.substring(0,600)}
+        ]})
+    });
+    if(!resp.ok) return null;
+    var data=await resp.json();
+    var raw=data.choices&&data.choices[0]?data.choices[0].message.content:'';
+    var m=raw.match(/\{[\s\S]*?\}/);
+    return m?JSON.parse(m[0]):null;
+  }catch(e){return null;}
+}
+
+async function callClaudeQC(ko,langName,translated){
+  var prompt='Game localization QC specialist. Respond ONLY with valid JSON: {"ok":true,"score":95,"issues":[]}.\nCheck: accuracy, misunderstandings, divisive language, inappropriate content, added content.\n\n[Korean Original]\n'+ko.substring(0,600)+'\n\n['+langName+' Translation]\n'+translated.substring(0,600);
+  try{
+    var raw=await callClaude('',prompt);
+    var m=raw.match(/\{[\s\S]*?\}/);
+    return m?JSON.parse(m[0]):null;
+  }catch(e){return null;}
+}
+
+async function fetchDriveFile(fileId){
+  try{
+    var res=await window.cowork.callMcpTool(
+      'mcp__f7e86f62-b56d-40f9-8ca3-9025b49cde11__read_file_content',
+      {fileId:fileId}
+    );
+    if(res&&res.content){
+      var c=res.content;
+      if(typeof c==='string') return c.substring(0,2000);
+      if(Array.isArray(c)) return c.map(function(x){return x.text||'';}).join('\n').substring(0,2000);
+    }
+    return '';
+  }catch(e){return '';}
+}
+
+function getTonePrompt(toneId,gameCode){
+  if(!toneId) return '공식적이고 정중한 말투를 사용하세요.';
+  var tones=getCustomTones();
+  var tone=tones.find(function(t){return t.id===toneId;});
+  if(!tone) return '공식적이고 정중한 말투를 사용하세요.';
+  var prompt=tone.prompt||'';
+  if(!prompt) return '공식적이고 정중한 말투를 사용하세요.';
+  if(prompt.length>80){
+    return '다음 [참고 예시]의 문체와 말투를 반드시 그대로 따라 번역하세요. 어휘 선택, 문장 구조, 격식 수준을 최대한 일치시키세요.\n\n[참고 예시]\n'+prompt.substring(0,1000);
+  }
+  return prompt;
+}
+
+async function getRefContext(gameCode){
+  var all=getDriveFiles('all').concat(getDriveFiles(gameCode));
+  if(!all.length) return '';
+  var parts=[];
+  await Promise.all(all.map(function(f){
+    return fetchDriveFile(f.fileId)
+      .then(function(text){if(text) parts.push('\n\n[참고 자료]\n['+f.name+']\n'+text.substring(0,1500));})
+      .catch(function(){});
+  }));
+  return parts.join('');
+}
+
+function escHtml(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function saveApiKey(){
+  var v=document.getElementById('input-claude-key').value.trim();
+  if(v) localStorage.setItem('key_claude',v); else localStorage.removeItem('key_claude');
+  updateApiStatus();
+}
+function saveOaiKey(){
+  var v=document.getElementById('input-oai-key').value.trim();
+  if(v) localStorage.setItem('key_oai',v); else localStorage.removeItem('key_oai');
+  updateApiStatus();
+}
+(function(){
+  var key=localStorage.getItem('key_claude');
+  var el=document.getElementById('input-claude-key');
+  if(key&&el) el.value=key;
+  var oaiKey=localStorage.getItem('key_oai');
+  var oaiEl=document.getElementById('input-oai-key');
+  if(oaiKey&&oaiEl) oaiEl.value=oaiKey;
+  var fbUrl=localStorage.getItem('key_fb_url');
+  var fbEl=document.getElementById('input-fb-url');
+  if(fbUrl&&fbEl) fbEl.value=fbUrl;
+  var fbSecret=localStorage.getItem('key_fb_secret');
+  var fbSEl=document.getElementById('input-fb-secret');
+  if(fbSecret&&fbSEl) fbSEl.value=fbSecret;
+  updateApiStatus();
+  updateFbStatus();
+  if(fbEnabled()){syncFromFirebase(false);startFbPolling();}
+})();
+
+(function init(){
+  updateApiStatus();
+  renderDashboard();
+})();
+</script>
+</body>
+</html>
